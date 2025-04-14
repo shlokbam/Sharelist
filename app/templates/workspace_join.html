@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Join Workspace - Zavana{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Join Workspace</h2>
+    <p class="subtitle">Enter the share code to join a workspace</p>
+    
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group">
+            {{ form.share_code.label }}
+            {{ form.share_code(class="form-control", placeholder="Enter 6-character code") }}
+            {% if form.share_code.errors %}
+            <div class="error-message">
+                {% for error in form.share_code.errors %}
+                <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            {{ form.submit(class="btn primary-btn") }}
+            <a href="{{ url_for('main.dashboard') }}" class="btn secondary-btn">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

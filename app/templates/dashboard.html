@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Sharelist{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h2>Welcome, {{ current_user.username }}!</h2>
+    <div class="dashboard-actions">
+    </div>
+</div>
+
+<!-- New Workspace Section -->
+<div class="workspace-banner">
+    <div class="workspace-actions">
+        <a href="{{ url_for('workspace.create_workspace') }}" class="btn workspace-btn">
+            <i class="fas fa-users"></i> Create Workspace
+        </a>
+        <a href="{{ url_for('workspace.join_workspace') }}" class="btn workspace-btn">
+            <i class="fas fa-sign-in-alt"></i> Join Workspace
+        </a>
+    </div>
+</div>
+
+<!-- Workspaces Section -->
+{% if current_user.joined_workspaces %}
+<div class="workspaces-section">
+    <h3>Your Workspaces</h3>
+    <div class="workspaces-grid">
+        {% for workspace in current_user.joined_workspaces %}
+        <div class="workspace-card">
+            <h4><a href="{{ url_for('workspace.view_workspace', workspace_id=workspace.id) }}">{{ workspace.name }}</a></h4>
+            <div class="workspace-meta">
+                <span><i class="fas fa-users"></i> {{ workspace.members|length }} members</span>
+                <span><i class="fas fa-list"></i> {{ workspace.shared_playlists|length }} playlists</span>
+            </div>
+            <div class="workspace-footer">
+                <span class="share-code">Code: <strong>{{ workspace.share_code }}</strong></span>
+                <a href="{{ url_for('workspace.view_workspace', workspace_id=workspace.id) }}" class="btn secondary-btn">View</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div class="search-container">
+    <form method="POST" action="{{ url_for('main.dashboard') }}" class="search-form">
+        {{ search_form.hidden_tag() }}
+        {{ search_form.query(class="search-input", placeholder="Search playlists...") }}
+        <button type="submit" class="search-btn">
+            <i class="fas fa-search"></i>
+        </button>
+    </form>
+    {% if query %}
+    <div class="search-results-info">
+        <p>Showing results for: <strong>{{ query }}</strong></p>
+        <a href="{{ url_for('main.dashboard') }}" class="clear-search">Clear search</a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="playlists-grid">
+    {% if playlists %}
+        {% for playlist in playlists %}
+        <div class="playlist-card">
+            <div class="playlist-info">
+                <h3><a href="{{ url_for('playlist.view_playlist', playlist_id=playlist.id) }}">{{ playlist.title }}</a></h3>
+                <p class="playlist-date">Created on {{ playlist.date_created.strftime('%B %d, %Y') }}</p>
+                {% if playlist.description %}
+                <p class="playlist-description">{{ playlist.description }}</p>
+                {% endif %}
+                <p class="link-count">{{ playlist.links.count() }} link(s)</p>
+                
+                {% if playlist.shared_in_workspaces %}
+                <div class="shared-badges">
+                    {% for workspace in playlist.shared_in_workspaces %}
+                    <span class="badge shared-badge" title="Shared in {{ workspace.name }}">
+                        <i class="fas fa-users"></i> Shared
+                    </span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="playlist-actions">
+                <a href="{{ url_for('playlist.view_playlist', playlist_id=playlist.id) }}" class="btn secondary-btn">View</a>
+                <a href="{{ url_for('playlist.delete_playlist', playlist_id=playlist.id) }}" class="btn delete-btn" onclick="return confirm('Are you sure you want to delete this playlist? This cannot be undone.')">Delete</a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            {% if query %}
+            <p>No playlists found matching '{{ query }}'.</p>
+            {% else %}
+            <p>You haven't created any playlists yet.</p>
+            <a href="{{ url_for('playlist.create_playlist') }}" class="btn primary-btn">Create Your First Playlist</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

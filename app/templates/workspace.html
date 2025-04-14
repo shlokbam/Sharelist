@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}{{ workspace.name }} - Zavana{% endblock %}
+
+{% block content %}
+<div class="workspace-header">
+    <div class="back-link">
+        <a href="{{ url_for('main.dashboard') }}"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    </div>
+    <h2>{{ workspace.name }}</h2>
+    <div class="share-code-box">
+        <span>Share Code: <strong>{{ workspace.share_code }}</strong></span>
+        <button class="copy-btn" onclick="copyToClipboard('{{ workspace.share_code }}')">
+            <i class="fas fa-copy"></i>
+        </button>
+    </div>
+    <p class="workspace-details">
+        Created by: {{ workspace.creator.username }} | 
+        Members: {{ workspace.members|length }} | 
+        Shared Playlists: {{ workspace.shared_playlists|length }}
+    </p>
+</div>
+
+<div class="workspace-sections">
+    <div class="workspace-section">
+        <h3>Members</h3>
+        <div class="members-list">
+            {% for member in workspace.members %}
+            <div class="member-item {% if member.id == workspace.creator_id %}creator{% endif %}">
+                <span>{{ member.username }}</span>
+                {% if member.id == workspace.creator_id %}
+                <span class="badge creator-badge">Creator</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="workspace-section">
+        <h3>Shared Playlists</h3>
+        {% if workspace.shared_playlists %}
+        <div class="shared-playlists-grid">
+            {% for playlist in workspace.shared_playlists %}
+            <div class="playlist-card">
+                <div class="playlist-info">
+                    <h4>{{ playlist.title }}</h4>
+                    <p class="playlist-owner">By: {{ playlist.owner.username }}</p>
+                    {% if playlist.description %}
+                    <p class="playlist-description">{{ playlist.description }}</p>
+                    {% endif %}
+                    <p class="link-count">{{ playlist.links.count() }} link(s)</p>
+                </div>
+                <div class="playlist-actions">
+                    <a href="{{ url_for('playlist.view_playlist', playlist_id=playlist.id) }}" class="btn view-btn">View</a>
+                    {% if playlist.user_id == current_user.id %}
+                    <a href="{{ url_for('workspace.unshare_playlist', workspace_id=workspace.id, playlist_id=playlist.id) }}" 
+                       class="btn delete-btn" onclick="return confirm('Remove this playlist from the workspace?')">
+                       Unshare
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p>No playlists have been shared in this workspace yet.</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="workspace-section">
+        <h3>Your Playlists</h3>
+        <p class="subtitle">Select a playlist to share in this workspace</p>
+        
+        {% if current_user.playlists.all() %}
+        <div class="your-playlists-list">
+            {% for playlist in current_user.playlists %}
+            <div class="your-playlist-item">
+                <span>{{ playlist.title }}</span>
+                {% if playlist in workspace.shared_playlists %}
+                <span class="badge shared-badge">Shared</span>
+                {% else %}
+                <a href="{{ url_for('workspace.share_playlist', workspace_id=workspace.id, playlist_id=playlist.id) }}" 
+                   class="btn share-btn">Share</a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p>You don't have any playlists to share.</p>
+            <a href="{{ url_for('playlist.create_playlist') }}" class="btn primary-btn">Create a Playlist</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        alert('Share code copied!');
+    }, function() {
+        alert('Failed to copy share code');
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1>Sharelist</h1>
+        <h2>Your Private Video Bookmark Vault</h2>
+        <p>Create playlists, save links, and never lose track of your favorite content again.</p>
+        <div class="cta-buttons">
+            <a href="{{ url_for('auth.register') }}" class="btn primary-btn">Get Started</a>
+            <a href="{{ url_for('auth.login') }}" class="btn secondary-btn">Login</a>
+        </div>
+    </div>
+</section>
+
+<section class="features">
+    <div class="feature-card">
+        <div class="feature-icon">
+            <i class="fas fa-lock"></i>
+        </div>
+        <h3>Private & Secure</h3>
+        <p>Your playlists and bookmarks are only visible to you.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">
+            <i class="fas fa-list"></i>
+        </div>
+        <h3>Custom Playlists</h3>
+        <p>Organize your content exactly how you want it.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">
+            <i class="fas fa-dice"></i>
+        </div>
+        <h3>Mystery Roulette</h3>
+        <p>Can't decide what to watch? Let us surprise you!</p>
+    </div>
+</section>
+{% endblock %}
